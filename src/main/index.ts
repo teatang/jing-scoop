@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { scoopService } from './scoopService'
 
 function createWindow(): void {
   // Create the browser window.
@@ -51,6 +52,43 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+  // Scoop IPC handlers
+  ipcMain.handle('scoop:get-path', async () => {
+    return scoopService.getScoopPath()
+  })
+
+  ipcMain.handle('scoop:list', async () => {
+    return scoopService.listApps()
+  })
+
+  ipcMain.handle('scoop:info', async (_, appName: string) => {
+    return scoopService.getAppInfo(appName)
+  })
+
+  ipcMain.handle('scoop:search', async (_, query: string) => {
+    return scoopService.searchApps(query)
+  })
+
+  ipcMain.handle('scoop:install', async (_, appName: string) => {
+    return scoopService.installApp(appName)
+  })
+
+  ipcMain.handle('scoop:uninstall', async (_, appName: string) => {
+    return scoopService.uninstallApp(appName)
+  })
+
+  ipcMain.handle('scoop:update', async (_, appName: string) => {
+    return scoopService.updateApp(appName)
+  })
+
+  ipcMain.handle('scoop:check-updates', async () => {
+    return scoopService.checkUpdates()
+  })
+
+  ipcMain.handle('scoop:get-updates', async () => {
+    return scoopService.getUpdates()
+  })
 
   createWindow()
 
